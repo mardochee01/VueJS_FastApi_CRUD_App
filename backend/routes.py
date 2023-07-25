@@ -18,7 +18,7 @@ async def read_student(student_id: str):
         raise HTTPException(status_code=404, detail="Student Not found")
     return student
 
-@router.put("/students/{student_id}", response_model=Student)
+@router.put("/students/{student_id}/", response_model=Student)
 async def update_student(student_id: str, student: Student):
     update_student = student_collection.find_one_and_update(
         {"_id": ObjectId(student_id)}, {"$set": student.dict()}, return_document=True)
@@ -26,7 +26,7 @@ async def update_student(student_id: str, student: Student):
         raise HTTPException(status_code=404, detail="Student Not found")
     return update_student
 
-@router.delete("/students/{student_id}", response_model=Student)
+@router.delete("/students/{student_id}/", response_model=Student)
 async def delete_student(student_id: str):
     delete_student = student_collection.find_one_and_delete({"_id": ObjectId(student_id)})
     if delete_student is None:
@@ -36,4 +36,6 @@ async def delete_student(student_id: str):
 @router.get("/students/", response_model=list[Student])
 async def read_all_student():
     students = list(student_collection.find())
+    for student in students:
+        student["id"] = str(student["_id"])
     return students
