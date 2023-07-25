@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from bson import ObjectId
 from database import student_collection
 from models import Student
+from typing import List
 
 router = APIRouter()
 
@@ -38,4 +39,9 @@ async def read_all_student():
     students = list(student_collection.find())
     for student in students:
         student["id"] = str(student["_id"])
+    return students
+
+@router.get("/students/search/", response_model=List[Student])
+async def search_students(query: str):
+    students = list(student_collection.find({"name": {"$regex": query, "$options": "i"}}))
     return students
